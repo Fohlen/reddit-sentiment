@@ -51,7 +51,7 @@ def process_line(line: str, output: io.TextIOWrapper):
     )
 
 
-def process_archive(yearmonth: tuple[int, int]):
+def process_archive(yearmonth: tuple[int, int], unlink: bool = True):
     year, month = yearmonth
     archive = ARCHIVE_TEMPLATE.format(year=year, month=month)
     version_path = pathlib.Path.cwd() / archive
@@ -62,6 +62,9 @@ def process_archive(yearmonth: tuple[int, int]):
         download_file(version_url, version_path)
 
     decompress_archive(version_path, output_path, process_line)
+
+    if unlink:
+        version_path.unlink()
 
 
 if __name__ == '__main__':
