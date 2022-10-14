@@ -10,7 +10,6 @@ from tenacity import retry
 import requests
 import zstandard
 from textblob import TextBlob
-from tqdm import tqdm
 from tqdm.contrib.concurrent import process_map
 
 COMMENTS_URL = "https://files.pushshift.io/reddit/comments"
@@ -77,5 +76,4 @@ if __name__ == '__main__':
     months = list(range(1, 13))
 
     with Pool(processes=4) as pool:
-        for year in tqdm(years):
-            process_map(process_archive, product([year], months), total=12)
+        process_map(process_archive, product(years, months), total=len(years)*12)
