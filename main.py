@@ -1,11 +1,6 @@
-# This is a sample Python script.
-
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 import io
 import json
 import pathlib
-import sys
 from typing import Callable
 
 import requests
@@ -50,10 +45,7 @@ def process_line(line: str, output: io.TextIOWrapper):
     )
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    year = 2005
-    month = 12
+def process_archive(year: int, month: int):
     archive = ARCHIVE_TEMPLATE.format(year=year, month=month)
     version_path = pathlib.Path.cwd() / archive
     output_path = pathlib.Path.cwd() / f"{archive}.tsv"
@@ -63,3 +55,8 @@ if __name__ == '__main__':
         download_file(version_url, version_path)
 
     decompress_archive(version_path, output_path, process_line)
+
+
+if __name__ == '__main__':
+    process_archive(2005, 12)
+
