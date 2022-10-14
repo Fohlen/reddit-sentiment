@@ -70,8 +70,8 @@ def process_archive(yearmonth: tuple[int, int], unlink: bool = True):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Run sentiment analysis on reddit comments corpus.')
-    parser.add_argument('start', nargs='?', default=2006)
-    parser.add_argument('end', nargs='?', default=2007)
+    parser.add_argument('start', nargs='?', default=2006, type=int)
+    parser.add_argument('end', nargs='?', default=2007, type=int)
     args = parser.parse_args()
     years = list(range(args.start, args.end + 1))
     months = list(range(1, 13))
