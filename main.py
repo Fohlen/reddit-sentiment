@@ -1,6 +1,8 @@
 import io
 import json
 import pathlib
+from itertools import product
+from multiprocessing import Pool
 from typing import Callable
 
 from tenacity import retry
@@ -9,10 +11,10 @@ import zstandard
 from textblob import TextBlob
 
 COMMENTS_URL = "https://files.pushshift.io/reddit/comments"
-ARCHIVE_TEMPLATE = "RC_{year}-{month}.zst"
+ARCHIVE_TEMPLATE = "RC_{year}-{month:02d}.zst"
 
 
-@retry
+#@retry
 def download_file(url: str, file_path: pathlib.Path):
     with requests.get(url, stream=True) as response, file_path.open("wb") as fp:
         response.raise_for_status()
@@ -47,7 +49,8 @@ def process_line(line: str, output: io.TextIOWrapper):
     )
 
 
-def process_archive(year: int, month: int):
+def process_archive(yearmonth: tuple[int, int]):
+    year, month = yearmonth
     archive = ARCHIVE_TEMPLATE.format(year=year, month=month)
     version_path = pathlib.Path.cwd() / archive
     output_path = pathlib.Path.cwd() / f"{archive}.tsv"
@@ -60,5 +63,8 @@ def process_archive(year: int, month: int):
 
 
 if __name__ == '__main__':
-    process_archive(2005, 12)
+    years = [2006]
+    months = list(range(1, 13))
 
+    with Pool(processes=4) as pool:
+        pool.map(process_archive, product(years, months))
