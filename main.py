@@ -16,6 +16,11 @@ COMMENTS_URL = "https://files.pushshift.io/reddit/comments"
 ARCHIVE_TEMPLATE = "RC_{year}-{month:02d}.zst"
 
 
+def url_exists(url) -> bool:
+    response = requests.head(url)
+    return response.status_code == 200
+
+
 @retry
 def download_file(url: str, file_path: pathlib.Path):
     with requests.get(url, stream=True) as response, file_path.open("wb") as fp:
@@ -58,13 +63,14 @@ def process_archive(yearmonth: tuple[int, int], unlink: bool = True):
     output_path = pathlib.Path.cwd() / f"{archive}.tsv"
     version_url = f"{COMMENTS_URL}/{archive}"
 
-    if not version_path.exists():
-        download_file(version_url, version_path)
+    if url_exists(version_url):
+        if not version_path.exists():
+            download_file(version_url, version_path)
 
-    decompress_archive(version_path, output_path, process_line)
+        decompress_archive(version_path, output_path, process_line)
 
-    if unlink:
-        version_path.unlink()
+        if unlink:
+            version_path.unlink()
 
 
 if __name__ == '__main__':
