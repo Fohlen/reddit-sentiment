@@ -1,3 +1,4 @@
+import argparse
 import io
 import json
 import pathlib
@@ -68,7 +69,11 @@ def process_archive(yearmonth: tuple[int, int], unlink: bool = True):
 
 
 if __name__ == '__main__':
-    years = [2006, 2007, 2008, 2009, 2010]
+    parser = argparse.ArgumentParser(description='Run sentiment analysis on reddit comments corpus.')
+    parser.add_argument('start', nargs='?', default=2006)
+    parser.add_argument('end', nargs='?', default=2007)
+    args = parser.parse_args()
+    years = list(range(args.start, args.end + 1))
     months = list(range(1, 13))
 
     with Pool(processes=4) as pool:
