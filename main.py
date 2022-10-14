@@ -14,7 +14,7 @@ COMMENTS_URL = "https://files.pushshift.io/reddit/comments"
 ARCHIVE_TEMPLATE = "RC_{year}-{month:02d}.zst"
 
 
-#@retry
+@retry
 def download_file(url: str, file_path: pathlib.Path):
     with requests.get(url, stream=True) as response, file_path.open("wb") as fp:
         response.raise_for_status()
