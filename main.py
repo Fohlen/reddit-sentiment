@@ -3,7 +3,6 @@ import io
 import json
 import pathlib
 from itertools import product
-from multiprocessing import Pool
 from typing import Callable
 
 from tenacity import retry
@@ -82,5 +81,4 @@ if __name__ == '__main__':
     years = list(range(args.start, args.end + 1))
     months = list(range(1, 13))
 
-    with Pool() as pool:
-        process_map(process_archive, product(years, months), total=len(years)*12)
+    process_map(process_archive, product(years, months), total=len(years)*12)
