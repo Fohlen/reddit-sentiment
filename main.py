@@ -81,5 +81,5 @@ if __name__ == '__main__':
     years = list(range(args.start, args.end + 1))
     months = list(range(1, 13))
 
-    with Pool(processes=4) as pool:
+    with Pool() as pool:
         process_map(process_archive, product(years, months), total=len(years)*12)
