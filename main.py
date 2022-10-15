@@ -2,6 +2,7 @@ import argparse
 import io
 import json
 import pathlib
+import re
 from itertools import product
 from typing import Callable
 
@@ -14,6 +15,7 @@ from tqdm import tqdm
 BASE_DIR = pathlib.Path.cwd() / "dataset"
 COMMENTS_URL = "https://files.pushshift.io/reddit/comments"
 ARCHIVE_TEMPLATE = "RC_{year}-{month:02d}.zst"
+ARCHIVE_REGEX = re.compile(r"RC_(\d{4})-(\d{2})")
 
 
 def url_exists(url) -> bool:
@@ -72,6 +74,11 @@ def process_archive(year: int, month: int, unlink: bool = True):
             version_path.unlink()
 
 
+def glob_archive_year_month(pattern: str) -> set[tuple[int, int]]:
+    groups = [ARCHIVE_REGEX.search(file.name).groups() for file in BASE_DIR.glob(pattern)]
+    return set([(int(year), int(month)) for year, month in groups])
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Run sentiment analysis on reddit comments corpus.')
     parser.add_argument('start', nargs='?', default=2006, type=int)
@@ -80,5 +87,10 @@ if __name__ == '__main__':
     years = list(range(args.start, args.end + 1))
     months = list(range(1, 13))
 
-    for y, m in tqdm(product(years, months), total=len(years)*12):
+    processing_archives = glob_archive_year_month("**/RC*.zst")
+    processed_archives = glob_archive_year_month("**/RC*.zst.tsv")
+
+    product_of_years_months = set(product(years, months))
+
+    for y, m in tqdm(processing_archives.union(processed_archives.difference(product_of_years_months))):
         process_archive(y, m)
