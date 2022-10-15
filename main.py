@@ -65,7 +65,7 @@ def process_archive(year: int, month: int, unlink: bool = True):
     version_url = f"{COMMENTS_URL}/{archive}"
 
     if url_exists(version_url):
-        if not version_path.exists():
+        if not version_path.exists() and not unlink:
             download_file(version_url, version_path)
 
         decompress_archive(version_path, output_path, process_line)
