@@ -12,6 +12,7 @@ import zstandard
 from textblob import TextBlob
 from tqdm.contrib.concurrent import process_map
 
+BASE_DIR = pathlib.Path.cwd() / "dataset"
 COMMENTS_URL = "https://files.pushshift.io/reddit/comments"
 ARCHIVE_TEMPLATE = "RC_{year}-{month:02d}.zst"
 
@@ -59,8 +60,8 @@ def process_line(line: str, output: io.TextIOWrapper):
 def process_archive(yearmonth: tuple[int, int], unlink: bool = True):
     year, month = yearmonth
     archive = ARCHIVE_TEMPLATE.format(year=year, month=month)
-    version_path = pathlib.Path.cwd() / archive
-    output_path = pathlib.Path.cwd() / f"{archive}.tsv"
+    version_path = BASE_DIR / archive
+    output_path = BASE_DIR / f"{archive}.tsv"
     version_url = f"{COMMENTS_URL}/{archive}"
 
     if url_exists(version_url):
