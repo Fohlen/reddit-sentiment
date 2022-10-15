@@ -92,5 +92,5 @@ if __name__ == '__main__':
 
     product_of_years_months = set(product(years, months))
 
-    for y, m in tqdm(processing_archives.union(processed_archives.difference(product_of_years_months))):
+    for y, m in tqdm(processing_archives.union(product_of_years_months.difference(processed_archives))):
         process_archive(y, m)
