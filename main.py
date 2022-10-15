@@ -9,7 +9,7 @@ from tenacity import retry
 import requests
 import zstandard
 from textblob import TextBlob
-from tqdm.contrib.concurrent import process_map
+from tqdm import tqdm
 
 BASE_DIR = pathlib.Path.cwd() / "dataset"
 COMMENTS_URL = "https://files.pushshift.io/reddit/comments"
@@ -56,8 +56,7 @@ def process_line(line: str, output: io.TextIOWrapper):
     )
 
 
-def process_archive(yearmonth: tuple[int, int], unlink: bool = True):
-    year, month = yearmonth
+def process_archive(year: int, month: int, unlink: bool = True):
     archive = ARCHIVE_TEMPLATE.format(year=year, month=month)
     version_path = BASE_DIR / archive
     output_path = BASE_DIR / f"{archive}.tsv"
@@ -81,4 +80,5 @@ if __name__ == '__main__':
     years = list(range(args.start, args.end + 1))
     months = list(range(1, 13))
 
-    process_map(process_archive, product(years, months), total=len(years)*12)
+    for y, m in tqdm(product(years, months), total=len(years)*12):
+        process_archive(y, m)
