@@ -18,10 +18,10 @@ ARCHIVE_REGEX = re.compile(r"RC_(\d{4})-(\d{2})")
 def preprocess_archive(archive_url: str, archive_path: pathlib.Path) -> pathlib.Path:
     with archive_path.with_stem(archive_path.stem + "_preprocess") as f2,\
             f2.with_suffix(".tsv") as preprocessed_archive_path:
-        ret = subprocess.run([
+        subprocess.run([
             "./preprocess_archive.sh", archive_url,
             str(archive_path), str(preprocessed_archive_path)
-        ])
+        ], capture_output=True)
         return preprocessed_archive_path
 
 
@@ -62,8 +62,8 @@ def glob_archive_year_month(pattern: str) -> set[tuple[int, int]]:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Run sentiment analysis on reddit comments corpus.')
-    parser.add_argument('start', nargs='?', default=2006, type=int)
-    parser.add_argument('end', nargs='?', default=2007, type=int)
+    parser.add_argument('start', nargs='?', default=2005, type=int)
+    parser.add_argument('end', nargs='?', default=2006, type=int)
     args = parser.parse_args()
     years = list(range(args.start, args.end + 1))
     months = list(range(1, 13))
@@ -72,7 +72,7 @@ if __name__ == '__main__':
     processed_archives = glob_archive_year_month("**/RC*.zst.tsv")
 
     product_of_years_months = set(product(years, months))
+    year_months_to_process = processing_archives.union(product_of_years_months.difference(processed_archives))
 
-    process_archive(2005, 12)
-    #for y, m in tqdm(processing_archives.union(product_of_years_months.difference(processed_archives))):
-    #    process_archive(y, m)
+    for y, m in tqdm(sorted(year_months_to_process)):
+        process_archive(y, m)
