@@ -7,7 +7,7 @@ from itertools import product
 
 import requests
 from textblob import TextBlob
-from tqdm import tqdm
+from tqdm.contrib.concurrent import process_map
 
 BASE_DIR = pathlib.Path.cwd() / "dataset"
 COMMENTS_URL = "https://files.pushshift.io/reddit/comments"
@@ -30,7 +30,8 @@ def url_exists(url: str) -> bool:
     return response.status_code == 200
 
 
-def process_archive(year: int, month: int):
+def process_archive(input_tuple: tuple[int, int]):
+    year, month = input_tuple
     archive = ARCHIVE_TEMPLATE.format(year=year, month=month)
     a_path = BASE_DIR / f"{archive}"
     version_url = f"{COMMENTS_URL}/{archive}"
@@ -74,5 +75,4 @@ if __name__ == '__main__':
     product_of_years_months = set(product(years, months))
     year_months_to_process = processing_archives.union(product_of_years_months.difference(processed_archives))
 
-    for y, m in tqdm(sorted(year_months_to_process)):
-        process_archive(y, m)
+    process_map(process_archive, sorted(year_months_to_process), max_workers=3)
