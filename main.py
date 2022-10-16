@@ -1,14 +1,11 @@
 import argparse
-import io
-import json
+import csv
 import pathlib
 import re
+import subprocess
 from itertools import product
-from typing import Callable
 
-from tenacity import retry
 import requests
-import zstandard
 from textblob import TextBlob
 from tqdm import tqdm
 
@@ -18,60 +15,44 @@ ARCHIVE_TEMPLATE = "RC_{year}-{month:02d}.zst"
 ARCHIVE_REGEX = re.compile(r"RC_(\d{4})-(\d{2})")
 
 
-def url_exists(url) -> bool:
+def preprocess_archive(archive_url: str, archive_path: pathlib.Path) -> pathlib.Path:
+    with archive_path.with_stem(archive_path.stem + "_preprocess") as f2,\
+            f2.with_suffix(".tsv") as preprocessed_archive_path:
+        ret = subprocess.run([
+            "./preprocess_archive.sh", archive_url,
+            str(archive_path), str(preprocessed_archive_path)
+        ])
+        return preprocessed_archive_path
+
+
+def url_exists(url: str) -> bool:
     response = requests.head(url)
     return response.status_code == 200
 
 
-@retry
-def download_file(url: str, file_path: pathlib.Path):
-    with requests.get(url, stream=True) as response, file_path.open("wb") as fp:
-        response.raise_for_status()
-        for chunk in response.iter_content():
-            if chunk:
-                fp.write(chunk)
-
-
-def decompress_archive(
-        archive_path: pathlib.Path,
-        output_path: pathlib.Path,
-        callback: Callable[[str, io.TextIOWrapper], None]
-):
-    with archive_path.open("rb") as fp, output_path.open("wt") as tp:
-        dctx = zstandard.ZstdDecompressor(max_window_size=2147483648)
-        with dctx.stream_reader(fp) as stream_reader:
-            text_stream = io.TextIOWrapper(stream_reader, encoding='utf-8')
-            for line in text_stream.readlines():
-                callback(line, tp)
-
-
-def process_line(line: str, output: io.TextIOWrapper):
-    document = json.loads(line)
-    blob = TextBlob(document["body"])
-    print(
-        document["id"],
-        document["subreddit"],
-        document["created_utc"],
-        *blob.sentiment,
-        sep="\t",
-        file=output
-    )
-
-
-def process_archive(year: int, month: int, unlink: bool = True):
+def process_archive(year: int, month: int):
     archive = ARCHIVE_TEMPLATE.format(year=year, month=month)
-    version_path = BASE_DIR / archive
-    output_path = BASE_DIR / f"{archive}.tsv"
+    a_path = BASE_DIR / f"{archive}"
     version_url = f"{COMMENTS_URL}/{archive}"
 
     if url_exists(version_url):
-        if not version_path.exists() or unlink:
-            download_file(version_url, version_path)
+        pre_path = preprocess_archive(version_url, a_path)
 
-        decompress_archive(version_path, output_path, process_line)
+        with a_path.with_suffix(".tsv") as output_path, \
+                pre_path.open("rt") as fp, output_path.open("wt") as output_fp:
+            reader = csv.reader(fp, delimiter="\t")
 
-        if unlink:
-            version_path.unlink()
+            for line in reader:
+                blob = TextBlob(line[3])
+                print(
+                    *line[:3],
+                    *blob.sentiment,
+                    sep="\t",
+                    file=output_fp
+                )
+
+        pre_path.unlink()
+        a_path.unlink()
 
 
 def glob_archive_year_month(pattern: str) -> set[tuple[int, int]]:
@@ -92,5 +73,6 @@ if __name__ == '__main__':
 
     product_of_years_months = set(product(years, months))
 
-    for y, m in tqdm(processing_archives.union(product_of_years_months.difference(processed_archives))):
-        process_archive(y, m)
+    process_archive(2005, 12)
+    #for y, m in tqdm(processing_archives.union(product_of_years_months.difference(processed_archives))):
+    #    process_archive(y, m)
