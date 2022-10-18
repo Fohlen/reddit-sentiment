@@ -70,8 +70,9 @@ if __name__ == '__main__':
     months = list(range(1, 13))
 
     processing_archives = glob_archive_year_month("**/RC*.zst")
-    processed_archives = glob_archive_year_month("**/RC*.zst.tsv")
+    processed_archives = glob_archive_year_month("**/RC*.tsv")
 
+    print(f"Omitting {len(processed_archives)} archives")
     product_of_years_months = set(product(years, months))
     year_months_to_process = processing_archives.union(product_of_years_months.difference(processed_archives))
 
