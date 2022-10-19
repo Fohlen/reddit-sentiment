@@ -63,11 +63,12 @@ def glob_archive_year_month(pattern: str) -> set[tuple[int, int]]:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Run sentiment analysis on reddit comments corpus.')
-    parser.add_argument('start', nargs='?', default=2005, type=int)
-    parser.add_argument('end', nargs='?', default=2006, type=int)
+    parser.add_argument('start_year', nargs='?', default=2005, type=int)
+    parser.add_argument('end_year', nargs='?', default=2006, type=int)
+    parser.add_argument('start_month', nargs='?', default=1, type=int)
     args = parser.parse_args()
     years = list(range(args.start, args.end + 1))
-    months = list(range(1, 13))
+    months = list(range(args.start_month, 13))
 
     processing_archives = glob_archive_year_month("**/RC*.zst")
     processed_archives = glob_archive_year_month("**/RC*.tsv")
