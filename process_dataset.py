@@ -1,3 +1,4 @@
+import argparse
 import pathlib
 
 from pyspark.sql import SparkSession
@@ -20,11 +21,13 @@ def load_dataset(session: SparkSession, dataset_path: str) -> DataFrame:
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Process datasets.')
+    parser.add_argument('dataset_path', nargs='?', default=pathlib.Path.cwd() / "dataset", type=pathlib.Path)
+    parser.add_argument('result_path', nargs='?', default=pathlib.Path.cwd() / "reddit-sentiment", type=pathlib.Path)
+    args = parser.parse_args()
     spark = SparkSession.builder.getOrCreate()
-    dataset_path = pathlib.Path.cwd() / "dataset"
-    result_path = pathlib.Path.cwd() / "reddit-sentiment"
 
-    timed_df = load_dataset(spark, str(dataset_path))
+    timed_df = load_dataset(spark, str(args.dataset_path))
     result_df = timed_df.groupby(
         year("created_utc").alias("year"),
         dayofyear("created_utc").alias("day"),
@@ -42,4 +45,4 @@ if __name__ == "__main__":
         .coalesce(1)\
         .write \
         .option("header", True) \
-        .csv(str(result_path))
+        .csv(str(args.result_path))
