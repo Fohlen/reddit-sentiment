@@ -67,11 +67,12 @@ if __name__ == '__main__':
     parser.add_argument('end_year', nargs='?', default=2006, type=int)
     parser.add_argument('start_month', nargs='?', default=1, type=int)
     args = parser.parse_args()
-    years = list(range(args.start, args.end + 1))
-    months = list(range(args.start_month, 13))
+    years = list(range(args.start_year, args.end_year + 1))
+    months = list(range(1, 13))
 
     processing_archives = glob_archive_year_month("**/RC*.zst")
     processed_archives = glob_archive_year_month("**/RC*.tsv")
+    processed_archives.update(product([args.start_year], range(1, args.start_month + 1)))
 
     print(f"Omitting {len(processed_archives)} archives")
     product_of_years_months = set(product(years, months))
