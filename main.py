@@ -7,7 +7,7 @@ from itertools import product
 
 import requests
 from textblob import TextBlob
-from tqdm.contrib.concurrent import process_map
+from tqdm import tqdm
 
 BASE_DIR = pathlib.Path.cwd() / "dataset"
 COMMENTS_URL = "https://files.pushshift.io/reddit/comments"
@@ -78,4 +78,5 @@ if __name__ == '__main__':
     product_of_years_months = set(product(years, months))
     year_months_to_process = processing_archives.union(product_of_years_months.difference(processed_archives))
 
-    process_map(process_archive, sorted(year_months_to_process), max_workers=3)
+    for ip in tqdm(sorted(year_months_to_process)):
+        process_archive(ip)
