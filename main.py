@@ -38,6 +38,7 @@ def process_archive(input_tuple: tuple[int, int]):
 
     if url_exists(version_url):
         pre_path = preprocess_archive(version_url, a_path)
+        a_path.unlink()
 
         with a_path.with_suffix(".tsv") as output_path, \
                 pre_path.open("rt") as fp, output_path.open("wt") as output_fp:
@@ -53,7 +54,6 @@ def process_archive(input_tuple: tuple[int, int]):
                 )
 
         pre_path.unlink()
-        a_path.unlink()
 
 
 def glob_archive_year_month(pattern: str) -> set[tuple[int, int]]:
