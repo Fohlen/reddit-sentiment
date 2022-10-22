@@ -1,6 +1,6 @@
 import argparse
 
-from main import process_archive
+from reddit_sentiment.annotate import process_archive
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run sentiment analysis for specific year')
