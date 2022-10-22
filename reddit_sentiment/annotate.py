@@ -1,5 +1,4 @@
 import csv
-
 import requests
 from textblob import TextBlob
 

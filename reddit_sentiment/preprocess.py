@@ -4,7 +4,7 @@ import subprocess
 
 file_path = pathlib.Path(__file__)
 
-BASE_DIR = file_path.parent.parent / "dataset"
+BASE_DIR = pathlib.Path.cwd() / "dataset"
 COMMENTS_URL = "https://files.pushshift.io/reddit/comments"
 ARCHIVE_TEMPLATE = "RC_{year}-{month:02d}.zst"
 ARCHIVE_REGEX = re.compile(r"RC_(\d{4})-(\d{2})")
