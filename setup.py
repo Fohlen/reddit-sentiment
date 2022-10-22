@@ -10,7 +10,7 @@ setup(
     url='https://github.com/Fohlen/reddit-sentiment',
     packages=['reddit_sentiment'],
     package_data={
-        'reddit_sentiment': ['reddit_sentiment/preprocess_archive.sh']
+        'reddit_sentiment': ['preprocess_archive.sh']
     },
     scripts=[
         'bin/distill-dataset',
