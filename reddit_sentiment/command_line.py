@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import argparse
 from itertools import product
 
@@ -15,7 +13,7 @@ def glob_archive_year_month(pattern: str) -> set[tuple[int, int]]:
     return set([(int(year), int(month)) for year, month in groups])
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser(description='Run sentiment analysis on reddit comments corpus.')
     parser.add_argument('start_year', nargs='?', default=2005, type=int)
     parser.add_argument('end_year', nargs='?', default=2006, type=int)
@@ -33,5 +31,10 @@ if __name__ == '__main__':
 
     if args.multithreading:
         process_map(process_archive, sorted(year_months_to_process))
-    for ip in tqdm(sorted(year_months_to_process)):
-        process_archive(ip)
+    else:
+        for ip in tqdm(sorted(year_months_to_process)):
+            process_archive(ip)
+
+
+if __name__ == '__main__':
+    main()
