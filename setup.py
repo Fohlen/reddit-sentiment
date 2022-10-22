@@ -8,8 +8,10 @@ setup(
     description='A reddit sentiment analysis toolkit',
     author='Lennard Berger',
     url='https://github.com/Fohlen/reddit-sentiment',
-    include_package_data=True,
     packages=['reddit_sentiment'],
+    package_data={
+        'reddit_sentiment': ['reddit_sentiment/preprocess_archive.sh']
+    },
     scripts=[
         'bin/distill-dataset',
         'bin/download-annotate-archive',
