@@ -15,6 +15,9 @@ It is derived from the Reddit Comments Archive hosted by pushshift.
 ```shell
 brew install curl jq
 python3 -m venv venv && source venv/bin/activate
+# update or you may run into setuptools issues, see https://stackoverflow.com/a/51969296
+pip install --upgrade pip
+pip install --upgrade setuptools
 python3 setup.py build install
 
 # use --help for help with the commands
