@@ -1,8 +1,12 @@
 import csv
+import sys
+
 import requests
 from textblob import TextBlob
 
+
 from reddit_sentiment.preprocess import ARCHIVE_TEMPLATE, BASE_DIR, COMMENTS_URL, preprocess_archive
+csv.field_size_limit(sys.maxsize)
 
 
 def url_exists(url: str) -> bool:
