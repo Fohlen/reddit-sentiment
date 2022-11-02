@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import argparse
 import pathlib
 
@@ -21,7 +20,7 @@ def load_dataset(session: SparkSession, dataset_path: str) -> DataFrame:
     return df.withColumn("created_utc", col("created_utc").cast("Timestamp"))
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(description='Process datasets.')
     parser.add_argument('dataset_path', nargs='?', default=pathlib.Path.cwd() / "dataset", type=pathlib.Path)
     parser.add_argument('result_path', nargs='?', default=pathlib.Path.cwd() / "dataset" / "result", type=pathlib.Path)
@@ -47,3 +46,7 @@ if __name__ == "__main__":
         .write \
         .option("header", True) \
         .csv(str(args.result_path))
+
+
+if __name__ == "__main__":
+    main()
