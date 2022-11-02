@@ -15,8 +15,8 @@ It is derived from the Reddit Comments Archive hosted by pushshift.
 poetry install
 
 # use --help for help with the commands
-poetry download-annotate-archives 2005 2006 --multithreading
-poetry distill-dataset
+poetry run download-annotate-archives 2005 2006 --multithreading
+poetry run distill-dataset
 ```
 
 ## Analysis
